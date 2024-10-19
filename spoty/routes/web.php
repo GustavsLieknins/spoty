@@ -8,8 +8,10 @@ use App\Http\Controllers\SpotyController;
 use Illuminate\Support\Facades\Auth;
 
 
+
 Route::get('/auth/spotify/redirect', [SpotyController::class, 'redirectToSpotify'])->name('spotify.login');
 Route::get('/auth/spotify/callback', [SpotyController::class, 'handleSpotifyCallback']);
+
 
 Route::get('/', function () {
     return view('welcome');

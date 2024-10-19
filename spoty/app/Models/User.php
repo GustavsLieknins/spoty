@@ -23,6 +23,7 @@ class User extends Authenticatable
         'avatar',          // Avatar URL
         'access_token',    // Spotify Access Token
         'refresh_token',   // Spotify Refresh Token
+        'token',    
     ];
     
     
