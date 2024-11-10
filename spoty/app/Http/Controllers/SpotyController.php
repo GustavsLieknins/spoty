@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Services\SpotifyService;
 use Illuminate\Http\Request;
-
+  
 class SpotyController extends Controller
 {
     protected $spotifyService;
@@ -30,6 +30,48 @@ class SpotyController extends Controller
         }
 
         return view('dashboard', compact('topSongs', 'timeRange'));
+    }
+
+    
+    public function genres()
+    {
+        $genres = $this->spotifyService->getGenres($limit = 50);
+
+        if ($genres === 401) {
+            Auth::logout();
+            return redirect()->route('login');
+        }
+        $genresCount = [];
+        foreach ($genres['items'] as $artist) {
+            foreach ($artist['genres'] as $genre) {
+                $genresCount[$genre] = ($genresCount[$genre] ?? 0) + 1;
+            }
+        }
+
+        $totalGenres = array_sum($genresCount);
+        $otherCount = 0;
+
+        $genresCount = collect($genresCount)
+            ->map(function ($count, $genre) use ($totalGenres, &$otherCount) {
+                $percentage = ($count / $totalGenres) * 100;
+                return [
+                    'genre' => $genre,
+                    'count' => $count,
+                    'percentage' => round($percentage, 2),
+                ];
+            })
+            ->sortByDesc('count')
+            ->values()
+            ->toArray();
+
+        $totalPercentage = array_sum(array_column($genresCount, 'percentage'));
+
+        if (abs($totalPercentage - 100) > 0.01) {
+            $difference = 100 - $totalPercentage;
+            $genresCount[0]['percentage'] = round($genresCount[0]['percentage'] + $difference, 2);
+        }
+
+        return view('genres', compact('genresCount'));
     }
 
     public function redirectToSpotify()

@@ -60,4 +60,30 @@ class SpotifyService
             throw $e;
         }
     }
+
+    
+    public function getGenres($limit)
+    {
+        try {
+            $response = $this->client->request('GET', 'https://api.spotify.com/v1/me/top/artists', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->accessToken,
+                    'Content-Type' => 'application/json',
+                ],
+                'query' => [
+                    'limit' => $limit,
+                ],
+            ]);
+            
+            return json_decode($response->getBody(), true);
+        } catch (RequestException $e) {
+            // Handle 401 Unauthorized error
+            if ($e->hasResponse() && $e->getResponse()->getStatusCode() === 401) {
+                return $response = 401;
+            }
+
+            // Handle other potential exceptions
+            throw $e;
+        }
+    }
 }
