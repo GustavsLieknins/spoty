@@ -86,4 +86,80 @@ class SpotifyService
             throw $e;
         }
     }
+
+public function createPlaylist($playlistName, $playlistDescription, $timeRange = 'short_term')
+{
+    try {
+        $topSongs = $this->getTopSongs(50, $timeRange);
+
+        if ($topSongs === 401) {
+            return $response = 401;
+        }
+
+        $tracks = array_map(function ($song) {
+            return $song['id'];
+        }, $topSongs['items']);
+
+        $userId = Auth::user()->spotify_id;
+
+        $playlistData = [
+            'name' => $playlistName ?: 'Default Playlist Name',
+            'description' => $playlistDescription,
+            'public' => false,
+        ];
+
+        $response = $this->client->request('POST', "https://api.spotify.com/v1/users/$userId/playlists", [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->accessToken,
+                'Content-Type' => 'application/json',
+            ],
+            'json' => $playlistData,
+        ]);
+
+        $playlistId = json_decode($response->getBody(), true)['id'];
+
+        $response = $this->client->request('POST', "https://api.spotify.com/v1/playlists/$playlistId/tracks", [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->accessToken,
+                'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'uris' => array_map(function ($track) {
+                    return "spotify:track:$track";
+                }, $tracks),
+            ],
+        ]);
+
+        return json_decode($response->getBody(), true);
+    } catch (RequestException $e) {
+        if ($e->hasResponse() && $e->getResponse()->getStatusCode() === 401) {
+            return $response = 401;
+        }
+
+        throw $e;
+    }
+}
+
+
+// public function createPlaylist(Request $request)
+// {
+//     $playlistName = $request->input('playlist_name');
+//     $playlistDescription = $request->input('playlist_description');
+
+//     $playlist = $this->spotifyService->createPlaylist($playlistName, $playlistDescription);
+
+//     return redirect()->route('dashboard')->with('success', 'Playlist created successfully!');
+// }
+
+// curl --request POST \
+// --url https://api.spotify.com/v1/users/smedjan/playlists \
+// --header 'Authorization: Bearer 1POdFZRZbvb...qqillRxMr2z' \
+// --header 'Content-Type: application/json' \
+// --data '{
+// "name": "New Playlist",
+// "description": "New playlist description",
+// "public": false
+// }'
+// /users/{user_id}/playlists
+
 }

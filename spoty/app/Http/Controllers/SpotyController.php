@@ -77,7 +77,7 @@ class SpotyController extends Controller
     public function redirectToSpotify()
     {
         // Request the user-top-read scope along with email
-        return Socialite::driver('spotify')->scopes(['user-top-read', 'user-read-email'])->redirect();
+        return Socialite::driver('spotify')->scopes(['user-top-read', 'user-read-email', 'playlist-modify-private'])->redirect();
 
     }
     
@@ -116,5 +116,21 @@ class SpotyController extends Controller
         } catch (\Exception $e) {
             return redirect()->route('login')->withErrors('Failed to login with Spotify: ' . $e->getMessage());
         }
+    }
+
+    public function createPlaylist(Request $request)
+    {
+        $playlistName = $request->input('playlistName');
+        $playlistDescription = $request->input('playlistDescription');
+
+        $playlist = $this->spotifyService->createPlaylist($playlistName, $playlistDescription);
+
+        return redirect()->route('genres')->with('success', 'Playlist created successfully!');
+    }
+
+    
+    public function createPlaylistShow()
+    {
+        return view('create');
     }
 }

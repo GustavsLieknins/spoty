@@ -18,6 +18,9 @@
                     <x-nav-link :href="route('genres')" :active="request()->routeIs('genres')">
                         {{ __('Top genres') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('create.show')" :active="request()->routeIs('create.show')">
+                        {{ __('Get ur own playlist!') }}
+                    </x-nav-link>
                 </div>
             </div>
 

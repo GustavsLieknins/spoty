@@ -27,6 +27,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/genres', [SpotyController::class, 'genres'])->name('genres');
+
+    Route::get('/create', [SpotyController::class, 'createPlaylistShow'])->name('create.show');
+    Route::post('/createPlaylist', [SpotyController::class, 'createPlaylist'])->name('create.create');
+
+    
 });
 
 require __DIR__.'/auth.php';
