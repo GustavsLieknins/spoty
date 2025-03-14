@@ -15,8 +15,8 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->string('spotify_id')->nullable();
             $table->string('avatar')->nullable();
-            $table->string('access_token')->nullable();
-            $table->string('token')->nullable();
+            $table->text('access_token')->nullable();
+            $table->text('token')->nullable();
             $table->string('refresh_token')->nullable();
         });
     }

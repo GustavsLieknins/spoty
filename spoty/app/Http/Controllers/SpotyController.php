@@ -32,6 +32,30 @@ class SpotyController extends Controller
         return view('dashboard', compact('topSongs', 'timeRange'));
     }
 
+    public function artists(Request $request)
+    {
+        $timeRange = $request->input('range', 'medium_term');
+        $limit = $request->input('limit', 20);
+        $offset = $request->input('offset', 0);
+
+        try {
+            $response = $this->spotifyService->getTopArtists($limit, $timeRange, $offset);
+
+            if ($response === 401) {
+                Auth::logout();
+                return redirect()->route('login');
+            }
+
+            $topArtists = $response['items'];
+            $total = $response['total'];
+
+            return view('artists', compact('topArtists', 'timeRange', 'limit', 'offset', 'total', 'timeRange'));
+        } catch (\Exception $e) {
+            // return redirect()->route('login')->withErrors('Failed to fetch top artists: ' . $e->getMessage());
+            return  $e->getMessage();
+        }
+    }
+
     
     public function genres()
     {
@@ -109,12 +133,14 @@ class SpotyController extends Controller
             }
 
             // Log in the user
-            Auth::login($user);
+            Auth::login($user); 
 
             // return redirect()->route('dashboard'); // Redirect to the intended page or dashboard
             return redirect()->route('top.songs');
         } catch (\Exception $e) {
             return redirect()->route('login')->withErrors('Failed to login with Spotify: ' . $e->getMessage());
+
+            // return  $e->getMessage();
         }
     }
 

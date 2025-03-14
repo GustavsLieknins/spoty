@@ -31,6 +31,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/create', [SpotyController::class, 'createPlaylistShow'])->name('create.show');
     Route::post('/createPlaylist', [SpotyController::class, 'createPlaylist'])->name('create.create');
 
+    // Route::get('/artists', [SpotyController::class, 'artists'])->name('artists');
+    Route::get('/artists', [SpotyController::class, 'artists'])->name('top.artists');
+
     
 });
 
