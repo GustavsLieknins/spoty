@@ -159,4 +159,36 @@ class SpotyController extends Controller
     {
         return view('create');
     }
+
+
+    public function showWrapped(Request $request)
+    {
+        $timeRange = $request->input('range', 'short_term');
+
+        $topSongs = $this->spotifyService->getTopSongs($limit = 5, $timeRange);
+        $topArtistsResponse = $this->spotifyService->getTopArtists(5, $timeRange, 0);
+        $topArtists = $topArtistsResponse['items'] ?? [];
+
+        $genresRaw = $this->spotifyService->getGenres(50);
+        $genreCounts = [];
+
+        foreach ($genresRaw['items'] as $artist) {
+            foreach ($artist['genres'] as $genre) {
+                $genreCounts[$genre] = ($genreCounts[$genre] ?? 0) + 1;
+            }
+        }
+
+        arsort($genreCounts);
+        $topGenre = key($genreCounts);
+
+        if ($topSongs === 401 || $topArtistsResponse === 401 || $genresRaw === 401) {
+            Auth::logout();
+            return redirect()->route('login');
+        }
+
+        return view('wrapped', compact('topSongs', 'topArtists', 'topGenre', 'timeRange'));
+    }
+
+    
+    
 }

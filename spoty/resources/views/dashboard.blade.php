@@ -1,6 +1,7 @@
 <x-app-layout>
-    <div class="flex flex-col items-center justify-center py-12 bg-gray-100 dark:bg-gray-800">
+    <div class="flex flex-col items-center justify-center py-12 bg-gradient-to-br from-black via-gray-900 to-gray-950">
         <h1 class="text-6xl font-bold text-gray-800 dark:text-white">Top Songs</h1>
+
         <div class="flex items-center space-x-4 mt-4">
             <div class="text-sm font-light text-gray-500 dark:text-gray-300">
                 Range
@@ -14,19 +15,25 @@
                 </select>
             </form>
         </div>
-        <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+
+        <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-12 w-full max-w-6xl px-4">
             @foreach ($topSongs['items'] as $song)
-            <a href="{{ $song['external_urls']['spotify'] }}" target="_blank">
-                <li class="bg-white dark:bg-gray-700 rounded-lg shadow-md p-4">
-                    <div class="flex items-center justify-between">
-                        <strong class="text-2xl font-bold text-gray-800 dark:text-white">{{ $song['name'] }}</strong>
-                        <span class="text-xs font-light text-gray-500 dark:text-gray-300">{{ implode(', ', array_column($song['artists'], 'name')) }}</span>
+            <li class="bg-white dark:bg-gray-700 rounded-xl shadow-lg p-6 transition hover:scale-105 hover:shadow-2xl">
+                <a href="{{ $song['external_urls']['spotify'] }}" target="_blank" class="block">
+                    <div class="relative w-[300px] h-[300px] overflow-hidden rounded-lg bg-gray-200 mx-auto">
+                        <img 
+                            src="{{ $song['album']['images'][0]['url'] }}" 
+                            alt="{{ $song['name'] }} cover" 
+                            class="absolute inset-0 w-full h-full object-cover"
+                        >
                     </div>
-                    <img src="{{ $song['album']['images'][0]['url'] }}" alt="{{ $song['name'] }} cover" class="w-full h-auto rounded-lg mt-4" width="100" height="100">
-                </li>
-            </a>
+                    <div class="flex flex-col mt-4 text-center">
+                        <span class="text-lg font-bold text-gray-800 dark:text-white truncate">{{ $song['name'] }}</span>
+                        <span class="text-sm text-gray-500 dark:text-gray-300 mt-1 truncate">{{ implode(', ', array_column($song['artists'], 'name')) }}</span>
+                    </div>
+                </a>
+            </li>
             @endforeach
         </ul>
     </div>
 </x-app-layout>
-

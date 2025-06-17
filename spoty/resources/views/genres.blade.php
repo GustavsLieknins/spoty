@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="flex flex-col items-center justify-center py-12 bg-gray-100 dark:bg-gray-800">
+    <div class="flex flex-col items-center justify-center py-12 bg-gradient-to-br from-black via-gray-900 to-gray-950">
         <h1 class="text-6xl font-bold text-gray-800 dark:text-white">Your Top Genres</h1>
         <ul class="space-y-6 mt-8 w-full max-w-3xl">
             @php

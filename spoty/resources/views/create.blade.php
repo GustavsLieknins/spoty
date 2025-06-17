@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="min-h-screen flex flex-col items-center justify-start pt-4 bg-gray-100 dark:bg-gray-800">
+    <div class="min-h-screen flex flex-col items-center justify-start pt-4 bg-gradient-to-br from-black via-gray-900 to-gray-950">
         <div class="container mx-auto px-4 py-8">
             <h1 class="text-4xl font-bold text-gray-800 dark:text-white">Create a new playlist</h1>
             <p class="mt-4 text-lg text-gray-600 dark:text-gray-400">It's going to place your top songs of the last 30 days!</p>
