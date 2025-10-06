@@ -9,7 +9,6 @@
           -moz-osx-font-smoothing: grayscale;
         }
         #wrappedContent {
-          /* padding-bottom: 6rem; space for bottom text */
         }
         body, html {
           margin: 0;
@@ -24,19 +23,16 @@
         }
       </style>
   
-      <!-- Title -->
       <h1 class="text-5xl md:text-7xl font-black text-center drop-shadow-lg">
         Your Gustify Wrapped
       </h1>
   
-      <!-- Download Button -->
       <div>
         <button id="downloadBtn" onclick="downloadWrapped()" class="download-ignore px-6 py-2 rounded-full bg-green-500 hover:bg-green-600 text-white text-lg font-semibold shadow-xl transition">
-          📥 Download Your Wrapped
+          Download Your Wrapped
         </button>
       </div>
   
-      <!-- Time Range -->
       <form method="GET" action="{{ route('wrapped.show') }}">
         <select name="range" onchange="this.form.submit()" class="download-ignore px-5 py-2 rounded-full bg-gray-800 text-white border border-gray-700 shadow-md">
           <option value="short_term" {{ $timeRange === 'short_term' ? 'selected' : '' }}>Last month</option>
@@ -45,10 +41,8 @@
         </select>
       </form>
   
-      <!-- Grid Display -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-7xl text-white">
   
-        <!-- Top Songs -->
         <div class="bg-white/20 rounded-2xl p-6 shadow-lg h-[500px] overflow-y-auto">
           <h2 class="text-2xl font-bold text-purple-300 mb-4">🎵 Top 5 Songs</h2>
           <ul class="space-y-4">
@@ -64,7 +58,6 @@
           </ul>
         </div>
   
-        <!-- Top Artists -->
         <div class="bg-white/20 rounded-2xl p-6 shadow-lg h-[500px] overflow-y-auto">
           <h2 class="text-2xl font-bold text-pink-300 mb-4">🧑‍🎤 Top 5 Artists</h2>
           <ul class="grid grid-cols-2 gap-4">
@@ -81,38 +74,29 @@
           </ul>
         </div>
   
-        <!-- Top Genre -->
         <div class="bg-white/20 rounded-2xl p-6 shadow-lg flex flex-col justify-center items-center h-[500px]">
           <h2 class="text-2xl font-bold text-amber-300 mb-4">🔥 Top Genre</h2>
           <p class="text-4xl font-extrabold text-green-400 animate-pulse">{{ $topGenre }}</p>
         </div>
       </div>
       
-      <!-- Hidden container for capture -->
       <div id="captureContainer" class="capture-container absolute top-0 left-0 w-full -z-10 opacity-0"></div>
     </div>
   
-    <!-- HTML2Canvas Export -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script>
       async function downloadWrapped() {
         const target = document.getElementById('wrappedContent');
         
-        // Create a temporary container for capture
         const tempContainer = document.createElement('div');
         tempContainer.className = 'relative w-full min-h-screen bg-fixed-for-capture';
-        tempContainer.style.background = '#0f172a'; // Solid background for capture
+        tempContainer.style.background = '#0f172a'; 
         
-        // Clone the content
         const contentClone = target.cloneNode(true);
-        
-        // Remove elements we don't want in the capture
         contentClone.querySelectorAll('.download-ignore').forEach(el => el.remove());
         
-        // Add to temp container
         tempContainer.appendChild(contentClone);
         
-        // Add to document but position off-screen
         tempContainer.style.position = 'fixed';
         tempContainer.style.top = '-9999px';
         tempContainer.style.left = '0';
@@ -123,14 +107,13 @@
           const canvas = await html2canvas(tempContainer, {
             scale: window.devicePixelRatio * 2,
             useCORS: true,
-            backgroundColor: '#0f172a', // Solid background
+            backgroundColor: '#0f172a',
             logging: true,
             ignoreElements: (element) => {
               return element.classList && element.classList.contains('download-ignore');
             }
           });
           
-          // Create download link
           const link = document.createElement('a');
           link.download = 'gustify-wrapped.png';
           link.href = canvas.toDataURL('image/png');
@@ -142,7 +125,6 @@
           console.error('Error generating image:', error);
           alert('Error generating image. Please try again.');
         } finally {
-          // Clean up temporary container
           document.body.removeChild(tempContainer);
         }
       }

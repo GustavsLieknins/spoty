@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Laravel\Socialite\Facades\Socialite;
-use Illuminate\Support\Facades\Auth; 
 use App\Models\User;
 use App\Services\SpotifyService;
 use Illuminate\Http\Request;
-  
+use Illuminate\Support\Facades\Auth;
+use Laravel\Socialite\Facades\Socialite;
+
 class SpotyController extends Controller
 {
     protected $spotifyService;
@@ -20,12 +19,12 @@ class SpotyController extends Controller
 
     public function index(Request $request)
     {
-        // Fetch top songs using the SpotifyService
-        $timeRange = $request->input('range', 'short_term');
+        $timeRange = $request->input('range', 'medium_term');
         $topSongs = $this->spotifyService->getTopSongs($limit = 50, $timeRange);
 
         if ($topSongs === 401) {
             Auth::logout();
+
             return redirect()->route('login');
         }
 
@@ -43,6 +42,7 @@ class SpotyController extends Controller
 
             if ($response === 401) {
                 Auth::logout();
+
                 return redirect()->route('login');
             }
 
@@ -51,18 +51,17 @@ class SpotyController extends Controller
 
             return view('artists', compact('topArtists', 'timeRange', 'limit', 'offset', 'total', 'timeRange'));
         } catch (\Exception $e) {
-            // return redirect()->route('login')->withErrors('Failed to fetch top artists: ' . $e->getMessage());
-            return  $e->getMessage();
+            return $e->getMessage();
         }
     }
 
-    
     public function genres()
     {
         $genres = $this->spotifyService->getGenres($limit = 50);
 
         if ($genres === 401) {
             Auth::logout();
+
             return redirect()->route('login');
         }
         $genresCount = [];
@@ -78,6 +77,7 @@ class SpotyController extends Controller
         $genresCount = collect($genresCount)
             ->map(function ($count, $genre) use ($totalGenres, &$otherCount) {
                 $percentage = ($count / $totalGenres) * 100;
+
                 return [
                     'genre' => $genre,
                     'count' => $count,
@@ -100,21 +100,17 @@ class SpotyController extends Controller
 
     public function redirectToSpotify()
     {
-        // Request the user-top-read scope along with email
         return Socialite::driver('spotify')->scopes(['user-top-read', 'user-read-email', 'playlist-modify-private'])->redirect();
-
     }
-    
+
     public function handleSpotifyCallback()
     {
         try {
-            // Get the authenticated user's Spotify information
             $spotifyUser = Socialite::driver('spotify')->user();
-            // Check if the user already exists
+
             $user = User::where('spotify_id', $spotifyUser->id)->first();
 
             if (!$user) {
-                // Create a new user if not found
                 $user = User::create([
                     'name' => $spotifyUser->name,
                     'email' => $spotifyUser->email,
@@ -125,22 +121,17 @@ class SpotyController extends Controller
                     'token' => $spotifyUser->token,
                 ]);
             } else {
-                // Update existing user's tokens
                 $user->update([
                     'access_token' => $spotifyUser->accessTokenResponseBody['access_token'],
                     'refresh_token' => $spotifyUser->accessTokenResponseBody['refresh_token'],
                 ]);
             }
 
-            // Log in the user
-            Auth::login($user); 
+            Auth::login($user);
 
-            // return redirect()->route('dashboard'); // Redirect to the intended page or dashboard
             return redirect()->route('top.songs');
         } catch (\Exception $e) {
-            return redirect()->route('login')->withErrors('Failed to login with Spotify: ' . $e->getMessage());
-
-            // return  $e->getMessage();
+            return redirect()->route('login')->withErrors('Failed to login with Spotify: '.$e->getMessage());
         }
     }
 
@@ -154,12 +145,10 @@ class SpotyController extends Controller
         return redirect()->route('genres')->with('success', 'Playlist created successfully!');
     }
 
-    
     public function createPlaylistShow()
     {
         return view('create');
     }
-
 
     public function showWrapped(Request $request)
     {
@@ -183,12 +172,10 @@ class SpotyController extends Controller
 
         if ($topSongs === 401 || $topArtistsResponse === 401 || $genresRaw === 401) {
             Auth::logout();
+
             return redirect()->route('login');
         }
 
         return view('wrapped', compact('topSongs', 'topArtists', 'topGenre', 'timeRange'));
     }
-
-    
-    
 }
